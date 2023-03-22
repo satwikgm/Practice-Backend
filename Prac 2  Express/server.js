@@ -4,12 +4,17 @@
 
 const http = require('http');
 const fs = require('fs');    // allows working with the file system
+const _ = require('lodash');
 
 // 2. Method to create a server in the http module
         // req : request object contains metadata(where , what ...) of the request coming from the browser
         // res : response object is used to send back the response for the request
-const server = http.createServer((req,res)=> {
-    console.log("Request has been made from browser to server");  // Will get consoled on terminal and not on the browser
+    const server = http.createServer((req,res)=> {
+        console.log("Request has been made from browser to server");  // Will get consoled on terminal and not on the browser
+
+    // Usage of lodash
+    const num = _.random(0,20)
+    console.log(num);
 
     // req object
     // console.log(req.method);
