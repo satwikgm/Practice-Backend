@@ -14,6 +14,9 @@ let users = {}
 // get : Used to retrieve data from a server , 
 // Here we are displaying the users object that we will receive from server
 app.get("/users" , (req,res)=>{
+    console.log(req.query);
+    console.log(req.query.name);
+    console.log(req.query.age);
     res.send(users);
 });
 
@@ -54,3 +57,20 @@ app.delete('/users' , (req,res)=>{
         message : "Data has been successfully deleted"
     });
 });
+
+// params : Included in url of the http requests , Used to pass additional information 
+// apart from the http requests
+
+// Here id is a parameter
+app.get('/users/:id' , (req,res)=>{
+    console.log(req.params.id);
+    console.log(req.params);
+    res.send("User id created")
+})
+
+// Here userame is a parameter
+app.get('/users/:username' , (req,res)=>{
+    console.log(req.params.username);
+    console.log(req.params);
+    res.send("Username created")
+})
