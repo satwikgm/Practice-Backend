@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignUp</title>
+</head>
+<body>
+
+    <form>
+        <label>Email</label>
+        <input type="email">
+        <label>Name</label>
+        <input type="text">
+        <label>Password</label>
+        <input type="password">
+        <button>Signup</button>
+    </form>
+
+    <!-- Axios Fetch -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        let btn = document.querySelector('button');
+
+        btn.addEventListener('click',async function(e) {
+
+            // To prevent refresh of webpage upon clicking signup
+            e.preventDefault(); // This prevents the default behaviour of the form i.e. reload upon clicking signup button
+
+
+            let email = document.querySelector("input[type='email']").value;
+            let name = document.querySelector("input[type='text']").value;
+            let password = document.querySelector("input[type='password']").value;
+
+            // Now using axios we will put up a post request
+            // Since we will use await we will have to make the function async
+            // We give object of email,name,password as callback function
+            let resp = await axios.post('/auth/signup' , {email,name,password});
+            // This will get printed on chrome console upon click
+            console.log('Response' , resp);
+        })
+    </script>
+</body>
+</html>

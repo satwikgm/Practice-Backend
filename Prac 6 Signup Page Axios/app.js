@@ -19,8 +19,10 @@ const users = [
   
 // mini app
 const userRouter = express.Router();
+const authRouter = express.Router();
 // base route
 app.use('/users',userRouter);   // Base Router is /users
+app.use('/auth',authRouter);   // Base Router is /auth
 
 // For get , post , patch , delete and queries
 userRouter
@@ -33,7 +35,10 @@ userRouter
 // For params 
 userRouter.route("/:id").get(getUsersById);
 
-
+authRouter
+    .route('/signup')
+    .get(getSignUp)
+    .post(postSignUp);
 
 // Instead of using these we are using the above router to route users
 // // get : Used to retrieve data from a server , 
@@ -97,5 +102,22 @@ function getUsersById(req,res) {
     res.json({
         message : "request received",
         data : obj
+    });
+}
+
+// Send HTML files
+function getSignUp(req,res) {
+    res.sendFile('/public/index.html' , {root : __dirname});
+}
+
+function postSignUp(req,res) {
+    // We received this from frontend
+    // Anything received is always stored in the req.body
+    let dataObject = req.body;
+    // This will get printed on our backend based on the object received from frontend
+    console.log('Backend ->' , dataObject);
+    res.json({
+        message : "User signed up" , 
+        data : dataObject
     });
 }
