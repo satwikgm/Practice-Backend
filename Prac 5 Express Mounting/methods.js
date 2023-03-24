@@ -9,8 +9,13 @@ app.listen(3000 , ()=>{
     console.log("Server started on port 3000");
 });
 
-let users = [];
-
+const users = [
+    { name: 'John', id: 1 },
+    { name: 'Jane', id: 2 },
+    { name: 'Bob', id: 3 },
+    { name: 'Alice', id: 4 }
+];
+  
 // mini app
 const userRouter = express.Router();
 // base route
@@ -81,6 +86,15 @@ function deleteUsers(req,res) {
 
 function getUsersById(req,res) {
     console.log(req.params.id);
-    console.log(req.params);
-    res.send("User id created")
+    let paramsId = req.params.id;
+    let obj = {};
+    for(let i=0;i<users.length;i++) {
+        if(users[i]['id'] == paramsId) {
+            obj = users[i];
+        }
+    }
+    res.json({
+        message : "request received",
+        data : obj
+    });
 }
