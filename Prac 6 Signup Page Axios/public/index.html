@@ -44,3 +44,22 @@
     </script>
 </body>
 </html>
+
+
+<!-- In the provided script, async/await is used to make an asynchronous POST request to a server endpoint when a button is clicked. Here's how it works:
+
+The script selects a button element and adds a click event listener to it.
+
+When the button is clicked, the event listener function is executed asynchronously.
+
+The event listener function first prevents the default behavior of the button click, which is to reload the page.
+
+Then, it retrieves the values of three input fields for email, name, and password from the HTML form.
+
+Using the Axios library, an asynchronous POST request is made to the server endpoint /auth/signup, passing the email, name, and password values as the request body.
+
+The await keyword is used to pause the execution of the function until the POST request is completed, and the response is received.
+
+The response is logged to the console using console.log().
+
+So, by using await with the axios.post() method, we can write cleaner, more readable, and less error-prone code, without worrying about callbacks or chaining multiple promises -->
