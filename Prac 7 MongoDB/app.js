@@ -10,13 +10,13 @@ app.listen(3000 , ()=>{
     console.log("Server started on port 3000");
 });
 
-const users = [
-    { name: 'John', id: 1 },
-    { name: 'Jane', id: 2 },
-    { name: 'Bob', id: 3 },
-    { name: 'Alice', id: 4 },
-    { name : 'John2' , id : 1}
-];
+// const users = [
+//     { name: 'John', id: 1 },
+//     { name: 'Jane', id: 2 },
+//     { name: 'Bob', id: 3 },
+//     { name: 'Alice', id: 4 },
+//     { name : 'John2' , id : 1}
+// ];
   
 // mini app
 const userRouter = express.Router();
@@ -51,11 +51,21 @@ function middleware1(req,res,next) {
     next();
 }
 
-function getUsers(req,res) {
-    console.log('getUser called');
-    res.send(users);
+// CRUD OPerations : Create => Post , Read => Get , Update =>Patch , Delete => Delete
+
+// CRUD Operations : Get => Read => We want to retrieve some data => find , findOne
+async function getUsers(req,res) {
+    // console.log(req.query);
+    let allUsers = await userModel.find();
+    let allUsers1 = await userModel.findOne({"name": "Satwik",});
+    res.json({
+        message : 'List of all users',
+        data1 : allUsers  ,
+        // data2 : allUsers1
+    });
 }
 
+// CRUD Operations : Post=> We want to send some data from frontend to backend=> 
 function postUsers(req,res) {
     console.log(req.body);
     users = req.body;
@@ -66,21 +76,34 @@ function postUsers(req,res) {
     })
 }
 
-function updateUsers(req,res) {
+
+// CRUD Operations : Patch => Update => Need to update an already existing data => findOneAndUpdate() 
+async function updateUsers(req,res) {
     console.log('req-body-data-> ' , req.body);
     let dataToBeUpdated = req.body;
-    for(key in dataToBeUpdated) {
-        users[key] = dataToBeUpdated[key];
-    }
+    // for(key in dataToBeUpdated) {
+    //     users[key] = dataToBeUpdated[key];
+    // }
+
+    // MongoDB Part
+    // Here we are updating the details of person with email into dataToBeUpdated coming as request
+    let userToBeUpdated = await userModel.findOneAndUpdate({"email": "satwik@gmail.com"},dataToBeUpdated);
+
     res.json({
-        message : "Data updated successfully"
+        message : "Data updated successfully",
+        data : userToBeUpdated
     })
 }
 
-function deleteUsers(req,res) {
-    users = {}
+// CRUD Operations : DELETE => findOneAndDelete() => Find something and delete
+async function deleteUsers(req,res) {
+    // users = {}
+
+    let dataToBeDeleted = req.body;
+    let userToBeDeleted = await userModel.findOneAndDelete(dataToBeDeleted)
     res.json({
-        message : "Data has been successfully deleted"
+        message : "Data has been successfully deleted",
+        dataDeleted : userToBeDeleted
     });
 }
 
@@ -113,15 +136,21 @@ function getSignUp(req,res,next) {
     // res.sendFile('/public/index.html' , {root : __dirname});
 }
 
-function postSignUp(req,res) {
+// CRUD Operations : Post => Read => We want to send some data from frontend to backend => create() 
+async function postSignUp(req,res) {
     // We received this from frontend
     // Anything received is always stored in the req.body
+    // Using frontend without Mongodb
+    // let dataObject = req.body;
+    // This will get printed on our backend based on the object received from frontend => Create
+
+    // Mongodb data
     let dataObject = req.body;
-    // This will get printed on our backend based on the object received from frontend
-    console.log('Backend ->' , dataObject);
+    let userData = await userModel.create(dataObject);
+    console.log('Backend ->' , userData);
     res.json({
         message : "User signed up" , 
-        data : dataObject
+        data : userData
     });
 }
 
@@ -174,14 +203,14 @@ const userModel = mongoose.model('userModel' , userSchema);
 // An immediately invoked function
 // This function will be immediately called on running the server
 // To get stored properly in the collection : all fields are required , email should be unique and password length must be >= 8
-(async function createUser() {
-    let user = {
-        name : "Chinu",
-        email : "chintu@gmail.com",
-        password : "2223",
-        confirmPassword : "2223"
-    };
-    // Takes an object as parameter
-    let data = await userModel.create(user);
-    console.log(data);
-})();
+// (async function createUser() {
+//     let user = {
+//         name : "abcd",
+//         email : "abcd@gmail.com",
+//         password : "222389191",
+//         confirmPassword : "222389191"
+//     };
+//     // Takes an object as parameter
+//     let data = await userModel.create(user);
+//     console.log(data);
+// })();
