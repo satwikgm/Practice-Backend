@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const emailValidator = require('email-validator');
 
 const app = express();
 
@@ -51,7 +52,6 @@ function middleware1(req,res,next) {
     next();
 }
 
-// CRUD OPerations : Create => Post , Read => Get , Update =>Patch , Delete => Delete
 
 // CRUD Operations : Get => Read => We want to retrieve some data => find , findOne
 async function getUsers(req,res) {
@@ -136,10 +136,11 @@ function getSignUp(req,res,next) {
     // res.sendFile('/public/index.html' , {root : __dirname});
 }
 
-// CRUD Operations : Post => Read => We want to send some data from frontend to backend => create() 
+// CRUD Operations : Post => Create => We want to send some data from frontend to backend => create() 
 async function postSignUp(req,res) {
     // We received this from frontend
     // Anything received is always stored in the req.body
+
     // Using frontend without Mongodb
     // let dataObject = req.body;
     // This will get printed on our backend based on the object received from frontend => Create
@@ -147,7 +148,7 @@ async function postSignUp(req,res) {
     // Mongodb data
     let dataObject = req.body;
     let userData = await userModel.create(dataObject);
-    console.log('Backend ->' , userData);
+    // console.log('Backend ->' , userData);
     res.json({
         message : "User signed up" , 
         data : userData
@@ -162,6 +163,11 @@ async function postSignUp(req,res) {
 // The db link here should not be exposed as it will lead to our entire db being public
 // So for now this piece of code is here
 // Later it will be shifted to a private file
+
+// Usage of Hooks
+// 1. Check for the validity of email format using npm package
+// 2. Check if password matches confirmPassword
+// 3. Don't store confirmPassword field => seperate pre hook
 
 const db_link = 'mongodb+srv://admin:N6asx6Vf993r6AI4@cluster0.kowujyl.mongodb.net/?retryWrites=true&w=majority';
 mongoose.connect(db_link)
@@ -181,7 +187,10 @@ const userSchema = mongoose.Schema({
     email : {
         type : String ,
         required : true ,
-        unique : true
+        unique : true,
+        validate : function() {
+            return emailValidator.validate(this.email);
+        }
     },
     password : {
         type : String ,
@@ -191,10 +200,54 @@ const userSchema = mongoose.Schema({
     confirmPassword : {
         type : String ,
         required : true,
-        minLength:8
+        minLength:8,
+        validate : function() {
+            return this.confirmPassword == this.password;
+        }
     }
     // Password and confirmPassword will be matched through "mongoDB hooks" (later)
 });
+
+
+// Mongoose Hooks : Helps to do some pre or postprocessing on data to be saved
+// e.g : To ensure the match of password and confirmPassword ,  email format validation
+
+// pre post hooks
+// After save event occours in the db
+
+// This hook gets executed before the data being saved in the database
+userSchema.pre('save' , function() {
+    console.log('Before saving in the db' , this);
+});
+
+
+userSchema.pre('save' , function() {  // To not save redundant field confirmPassword in db
+    this.confirmPassword = undefined;
+})
+// this lets us obtain the request received
+
+// This hook gets executed after the data gets saved in the database
+userSchema.post('save' , function(doc) {
+    console.log('After saving in the db' , doc);
+});
+// All pre hooks are executed before any post hook
+
+// Before saving in the db {
+//     name: 'hookabar',
+//     email: 'hookabar@gmail.com',
+//     password: '12345678',
+//     _id: new ObjectId("6420371e2dcc5fcd5b72b284")
+//   }
+//   After saving in the db {
+//     name: 'hookabar',
+//     email: 'hookabar@gmail.com',
+//     password: '12345678',
+//     _id: new ObjectId("6420371e2dcc5fcd5b72b284"),
+//     __v: 0
+//   }
+
+
+
 
 // model
 // Model based on our schema above (Login schema)
