@@ -1,10 +1,11 @@
 const express = require('express');
 const userRouter = express.Router();
 const userModel = require('../public/models/userModel');
+const protectRoute = require('./authHelper');
 
 userRouter
     .route("/")                 // First parameter in any normal route
-    .get(getUsers)              // Second parameters (Functions) ....
+    .get(protectRoute , getUsers)    // protectRoute : Can get users only if u are logged in          // Second parameters (Functions) ....
     .post(postUsers)
     .patch(updateUsers)
     .delete(deleteUsers);
@@ -104,5 +105,5 @@ function getCookies(req,res) {
     res.send("Cookies saved");
 }
  
-
+ 
 module.exports = userRouter;

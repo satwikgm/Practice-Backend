@@ -65,6 +65,11 @@ async function loginUser(req,res) {
                 // Hashed == Normal ?? How to compare??
                 // Using bcrypt compare function
                 if(user.password == data.password) {
+                    // It means that user has logged in
+                    // Now we will make a cookie that gives a message of isLoggedIn and sets flag to true
+                    // This will be used in protect route , so that access of user's data can be only given
+                    // to logged in users.
+                    res.cookie('isLoggedIn' , true , {httpOnly : true});
                     return res.json({
                         message: "User logged in",
                         userDetails: data 
@@ -89,28 +94,9 @@ async function loginUser(req,res) {
         }
     }
     catch(err) {
-        let data = req.body;
-        let user = userModel.findOne({email : data.email});
-        if(user) {
-            // Hashed == Normal How to compare??
-            // Using bcrypt compare function
-            if(user.password == data.password) {
-                return res.json({
-                    message: "User logged in",
-                    userDetails: data 
-                }) 
-            }
-            else {
-                return res.json({
-                    message: "Incorrect Credentials"
-                })
-            }
-        }
-        else {
-            return resstatus(500).json({
-                message: err.message
-            })
-        }
+        return res.status(500).json({
+            message: err.message
+        })
     }
 }
 
