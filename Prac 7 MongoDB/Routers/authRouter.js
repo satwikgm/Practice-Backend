@@ -1,6 +1,10 @@
 const express = require('express');
 const authRouter = express.Router();
 const userModel = require('../public/models/userModel');
+const jwt = require('jsonwebtoken');
+// Random secret key stored in backend
+const JWT_KEY = require('../../secrets');
+
 
 authRouter
     .route('/signup')
@@ -65,11 +69,21 @@ async function loginUser(req,res) {
                 // Hashed == Normal ?? How to compare??
                 // Using bcrypt compare function
                 if(user.password == data.password) {
-                    // It means that user has logged in
-                    // Now we will make a cookie that gives a message of isLoggedIn and sets flag to true
-                    // This will be used in protect route , so that access of user's data can be only given
-                    // to logged in users.
-                    res.cookie('isLoggedIn' , true , {httpOnly : true});
+                    // // Now we will make a cookie that gives a message of isLoggedIn and sets flag to true
+                    // // This will be used in protect route , so that access of user's data can be only given
+                    // // to logged in users.
+                    // res.cookie('isLoggedIn' , true , {httpOnly : true});
+
+                    // Instead of cookie we will use JWT
+                    // In payload : UID
+                    // In secretKey : We give secret key stored in backend (secrets.js)
+                    // In third field we can give algorithm, Here we don't we use default SHA256
+                    let uid = user['_id'];  //  _id : Unique id created by mongodb
+                    let token = jwt.sign({payload : uid} , JWT_KEY);  // signature
+                    // In cookie we send token 
+                    res.cookie('login' , token , {httpOnly : true});
+
+
                     return res.json({
                         message: "User logged in",
                         userDetails: data 
