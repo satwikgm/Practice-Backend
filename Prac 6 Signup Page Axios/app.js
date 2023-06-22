@@ -121,7 +121,7 @@ function middleware(req,res,next) {
 
 // Send HTML files
 function getSignUp(req,res) {
-    console.log('Now get signup is called');
+    console.log('Now get signup is called due to next');
     res.sendFile('/public/index.html' , {root : __dirname});
 }
 
