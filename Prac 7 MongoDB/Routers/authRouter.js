@@ -4,7 +4,7 @@ const userModel = require('../public/models/userModel');
 const jwt = require('jsonwebtoken');
 // Random secret key stored in backend
 const JWT_KEY = require('../../secrets');
-
+const {   login   } = require('../controller/authController');
 
 authRouter
     .route('/signup')
@@ -13,7 +13,7 @@ authRouter
 
 authRouter
     .route('/login')
-    .post(loginUser)
+    .post(login)
 
 function middleware1(req,res,next) {
     console.log('Middleware1 encountered');
@@ -51,67 +51,6 @@ async function postSignUp(req,res) {
         message : "User signed up" , 
         data : userData
     });
-}
-
-// email and password will be receivedin req.body
-// Based on unique email we will retreive the user
-async function loginUser(req,res) {
-    try {
-        // Will contain email and password
-        let data = req.body;
-        // Data should have email
-        if(data.email)
-        {
-            // Find user with the email in req body
-            let user = await userModel.findOne({email:data.email});
-            // if user exists (defined)
-            if(user) {
-                // Hashed == Normal ?? How to compare??
-                // Using bcrypt compare function
-                if(user.password == data.password) {
-                    // // Now we will make a cookie that gives a message of isLoggedIn and sets flag to true
-                    // // This will be used in protect route , so that access of user's data can be only given
-                    // // to logged in users.
-                    // res.cookie('isLoggedIn' , true , {httpOnly : true});
-
-                    // Instead of cookie we will use JWT
-                    // In payload : UID
-                    // In secretKey : We give secret key stored in backend (secrets.js)
-                    // In third field we can give algorithm, Here we don't we use default SHA256
-                    let uid = user['_id'];  //  _id : Unique id created by mongodb
-                    let token = jwt.sign({payload : uid} , JWT_KEY);  // signature
-                    // In cookie we send token 
-                    res.cookie('login' , token , {httpOnly : true});
-
-
-                    return res.json({
-                        message: "User logged in",
-                        userDetails: data 
-                    }) 
-                }
-                else {
-                    return res.json({
-                        message: "Incorrect Credentials"
-                    })
-                }
-            }
-            else {
-                return res.json({
-                    message: "User not found"
-                })
-            }
-        }
-        else {
-            res.json({
-                message: "Email field is empty"
-            })
-        }
-    }
-    catch(err) {
-        return res.status(500).json({
-            message: err.message
-        })
-    }
 }
 
 module.exports = authRouter;

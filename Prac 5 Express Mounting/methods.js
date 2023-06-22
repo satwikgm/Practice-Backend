@@ -31,7 +31,9 @@ userRouter
     .delete(deleteUsers);
 
 // For params 
-userRouter.route("/:id").get(getUsersById);
+userRouter.
+    route("/:id").
+    get(getUsersById);
 
 
 

@@ -63,14 +63,14 @@ app.delete('/users' , (req,res)=>{
 
 // Here id is a parameter
 app.get('/users/:id' , (req,res)=>{
-    console.log(req.params.id);
-    console.log(req.params);
+    console.log(req.params.id)
+    console.log(req.params)
     res.send("User id created")
 })
 
 // Here userame is a parameter
 app.get('/users/:username' , (req,res)=>{
-    console.log(req.params.username);
-    console.log(req.params);
+    console.log(req.params.username)
+    console.log(req.params)
     res.send("Username created")
 })

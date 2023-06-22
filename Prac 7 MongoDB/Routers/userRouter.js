@@ -1,28 +1,40 @@
 const express = require('express');
 const userRouter = express.Router();
 const userModel = require('../public/models/userModel');
-const protectRoute = require('./authHelper');
+// const protectRoute = require('./authHelper');
 const req = require('express/lib/request');
-const { getUsers , postUsers , updateUsers , deleteUsers , getUsersById , setCookies , getCookies } = require('../controller/userController')
+const { getUser , getAllUser  , updateUser , deleteUser   } = require('../controller/userController')
+const { signup , login , isAuthorised , protectRoute } = require('../controller/authController');
+
+/* Options with the user */
+userRouter
+    .route(':/id')
+    .patch(updateUser)
+    .delete(deleteUser)
+
 
 userRouter
-    .route("/")                 // First parameter in any normal route
-    .get(protectRoute , getUsers)    // protectRoute : Can get users only if u are logged in          // Second parameters (Functions) ....
-    .post(postUsers)
-    .patch(updateUsers)
-    .delete(deleteUsers);
+    .route('/signup')
+    .post(signup)
 
-    userRouter
-        .route("/getCookies")
-        .get(getCookies);
+userRouter
+    .route('/login')
+    .post(login)
 
-    userRouter
-        .route("/setCookies")
-        .get(setCookies);
 
-userRouter.route("/:id").get(getUsersById);
+/*  Profile Page
+ // A user should be logged in to see his profile
+// so protected */
+userRouter.use(protectRoute)
+userRouter
+    .route('/userProfile') 
+    .get(getUser)
 
-// All underlying functoins and logic in Conroller folder ( userConroller.js )
- 
- 
+// Middleware for admin specific function
+userRouter.use(isAuthorised(['admin']));
+
+userRouter
+    .route('')
+    .get(getAllUser)
+
 module.exports = userRouter;

@@ -46,6 +46,8 @@ authRouter
     .get(middleware , getSignUp)
     .post(postSignUp);
 
+    // How to use middleware function
+    // We use next to call the next middle ware function
 function middleware(req,res,next) {
     console.log('Middleware encountered');
     next();

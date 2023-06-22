@@ -1,87 +1,115 @@
 const userModel = require('../public/models/userModel')
 
 // CRUD Operations : Get => Read => We want to retrieve some data => find , findOne
-module.exports.getUsers = async function getUsers(req,res) {
+module.exports.getUser  = async function getUser(req,res) {
     // console.log(req.query);
-    let allUsers = await userModel.find();
-    let allUsers1 = await userModel.findOne({"name": "Satwik",});
-    res.json({
-        message : 'List of all users',
-        data1 : allUsers  ,
-        // data2 : allUsers1
-    });
+    let id = req.params.id;
+    let user = await userModel.findById(id);
+    if(user) {
+        return res.json(user)
+    }
+    else {
+        return res.json({
+            message : "User not found"
+        })
+    }
 }
-
-// CRUD Operations : Post=> We want to send some data from frontend to backend=> 
-module.exports.postUsers = function postUsers(req,res) {
-    console.log(req.body);
-    users = req.body;
-
-    res.json({
-        message : "Data received successfully" , 
-        user : req.body
-    })
-}
-
 
 // CRUD Operations : Patch => Update => Need to update an already existing data => findOneAndUpdate() 
-module.exports.updateUsers = async function updateUsers(req,res) {
-    console.log('req-body-data-> ' , req.body);
-    let dataToBeUpdated = req.body;
-    // for(key in dataToBeUpdated) {
-    //     users[key] = dataToBeUpdated[key];
-    // }
-
-    // MongoDB Part
-    // Here we are updating the details of person with email into dataToBeUpdated coming as request
-    let userToBeUpdated = await userModel.findOneAndUpdate({"email": "satwik@gmail.com"},dataToBeUpdated);
-
-    res.json({
-        message : "Data updated successfully",
-        data : userToBeUpdated
-    })
+module.exports.updateUser = async function updateUsers(req,res) {
+    // console.log('req-body-data-> ' , req.body);
+    try {
+        let id = req.params.id;
+        let user = await userModel.findById(id);
+        let dataToBeUpdated = req.body;
+    
+        if(user) {
+            const keys = [];
+            for(let key in dataToBeUpdated) {
+                keys.push(key);
+            }
+    
+            for(let i=0;i<keys.length;i++) {
+                user[keys[i]] = dataToBeUpdated[keys[i]];
+            }
+        
+            const updatedData = await user.save();
+    
+            res.json({
+                message : "Data updated successfully",
+                data : userToBeUpdated
+            })
+        }
+        else {
+            res.json({
+                message : "User not found"
+            });
+        }
+    } catch (err) {
+        res.json({
+            message : err
+        })
+    }
 }
 
 // CRUD Operations : DELETE => findOneAndDelete() => Find something and delete
-module.exports.deleteUsers = async function deleteUsers(req,res) {
+module.exports.deleteUser = async function deleteUsers(req,res) {
     // users = {}
 
-    let dataToBeDeleted = req.body;
-    let userToBeDeleted = await userModel.findOneAndDelete(dataToBeDeleted)
-    res.json({
-        message : "Data has been successfully deleted",
-        dataDeleted : userToBeDeleted
-    });
-}
-
-module.exports.getUsersById = function getUsersById(req,res) {
-    console.log(req.params.id);
-    let paramsId = req.params.id;
-    let obj = {};
-    for(let i=0;i<users.length;i++) {
-        if(users[i]['id'] == paramsId) {
-            obj = users[i];
+    try {
+        let id = req.params.id;
+        let user = await userModel.findByIdAndDelete(id)
+        if(!user) {
+            res.json({
+                message : "User does not exist"
+            })
         }
+        res.json({
+            message : "Data has been successfully deleted",
+            dataDeleted : userToBeDeleted
+        });
     }
-    res.json({
-        message : "request received",
-        data : obj
-    });
+    catch(err) {
+        res.json({
+            message : err
+        })
+    }
 }
 
-module.exports.setCookies = function setCookies(req,res) {
-    // res.setHeader('Set-Cookie','isLoggedIn=true')
-    // Cookie will expire after one day
-    res.cookie('isLoggedIn',true,{maxAge:1000*60*60*24, secure: true, httpOnly: true});
-    res.cookie('isPrimeMember',true);
-    res.send('cookies have been set');
+module.exports.getAllUser = async function getUsersById(req,res) {
+    try {
+        let users = await userModel.find();
+        if(users) {
+            res.json({
+                message : "users retreived",
+                data : users
+            })
+        }
+        else {
+            res.json({
+                message: "No users"
+            })
+        }
+    } catch (err) {
+        res.json({
+            message : err
+        })
+    }
 }
 
-module.exports.getCookies = function getCookies(req,res) {
-    // res.setHeader('Set-Cookie','isLoggedIn=true')
-    // res.send('cookies has been set');
-    let cookies = req.cookies.isLoggedIn;
-    console.log(cookies);
-    res.send("Cookies saved");
-}
+// module.exports.setCookies = function setCookies(req,res) {
+//     // res.setHeader('Set-Cookie','isLoggedIn=true')
+//     // Cookie will expire after one day
+//     res.cookie('isLoggedIn',true,{maxAge:1000*60*60*24, secure: true, httpOnly: true});
+//     res.cookie('isPrimeMember',true);
+//     res.send('cookies have been set');
+// }
 
+// module.exports.getCookies = function getCookies(req,res) {
+//     // res.setHeader('Set-Cookie','isLoggedIn=true')
+//     // res.send('cookies has been set');
+//     let cookies = req.cookies.isLoggedIn;
+//     console.log(cookies);
+    // res.send("Cookies saved");
+// }
+// 
